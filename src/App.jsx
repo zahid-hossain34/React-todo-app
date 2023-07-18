@@ -1,35 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// eslint-disable-next-line no-unused-vars
+import React, { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import AddTask from "./component/AddTask";
+import TaskList from "./component/TaskList";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [taskList, setTaskList] = useState([]);
+  // Load tasks from local storage on component mount
+  // useEffect(() => {
+  //   const storedTasks = localStorage.getItem('taskList');
+  //   if (storedTasks) {
+  //     setTaskList(JSON.parse(storedTasks));
+  //   }
+  //   console.log(storedTasks);
+  // }, []);
+
+  // Save tasks to local storage whenever the taskList changes
+  // useEffect(() => {
+  //   localStorage.setItem('taskList', JSON.stringify(taskList));
+  //   console.log(taskList);
+  // }, [taskList]);
+
+  // const handleInputChange = (event) => {
+  //   setTask(event.target.value);
+  // };
+
+  const addTask = (newTask) => {
+    setTaskList([
+      ...taskList,
+      { id: Date.now(), description: newTask, isComplete: false },
+    ]);
+  };
+
+  const removeTask = (taskId) => {
+    const updatedList = taskList.filter((task) => task.id !== taskId);
+    setTaskList(updatedList);
+    toast.warn("Task removed successfully!", {
+      autoClose: 1000,
+    });
+  };
+
+  const toggleComplete = (item) => {
+    const updatedList = taskList.map((task) =>
+      task.id === item?.id ? { ...task, isComplete: !task.isComplete } : task
+    );
+    if (!item.isComplete) {
+      toast.info("Task mark as compelte!", {
+        autoClose: 1000,
+      });
+    } else {
+      toast.info("Task mark as incompelte!", {
+        autoClose: 1000,
+      });
+    }
+
+    setTaskList(updatedList);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="    flex justify-center flex-col space-y-10 p-2 sm:p-0 ">
+      <AddTask onAddTask={addTask} />
+      <TaskList
+        taskList={taskList}
+        onToggleComplete={toggleComplete}
+        onRemoveTask={removeTask}
+      />
+      <ToastContainer />
+    </div>
+  );
+};
 
-export default App
+export default App;
