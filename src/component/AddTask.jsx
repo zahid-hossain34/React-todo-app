@@ -1,10 +1,12 @@
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-const AddTask = ({ onAddTask }) => {
+import { TodoContext } from "../context/TodoContext";
+const AddTask = () => {
   const [task, setTask] = useState("");
+  const [ todos, setTodos ] = useContext( TodoContext );
 
   const handleInputChange = (event) => {
     setTask(event.target.value);
@@ -12,7 +14,16 @@ const AddTask = ({ onAddTask }) => {
 
   const addTask = () => {
     if (task.trim() !== "") {
-      onAddTask(task);
+      const newTask = {
+        id: Date.now(),
+        description: task,
+        isComplete: false,
+      };
+      setTodos([
+        ...todos,
+        newTask,
+      ]);
+    
       setTask("");
       toast.success("Task added successfully!", {
         autoClose: 1000,
@@ -23,6 +34,9 @@ const AddTask = ({ onAddTask }) => {
       });
     }
   };
+  useEffect(() => {
+    localStorage.setItem("taskList", JSON.stringify(todos));
+  }, [todos]);
 
   return (
     <div className="  relative ">
